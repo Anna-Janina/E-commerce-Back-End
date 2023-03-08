@@ -12,7 +12,6 @@ router.get('/', (req, res) => {
   .catch((error) => res.status(500).json(error))
 });
 
-
 router.get('/:id', async (req, res) => {
   Category.findOne({
     where: {
