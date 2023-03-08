@@ -3,68 +3,51 @@ const { Category, Product } = require('../../models');
 
 // The `/api/categories` endpoint
 
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
   // find all categories
-  try {
-    const list = await Category.findAll({
-      // be sure to include its associated Products
-      include: {
-        model: Product,
-        attributes: ['id', 'product_name', 'price', 'stock', 'category_id'],
-      }
-    })
-    res.json(list)
-  }
-  catch(error) { res.status(500).json(error) }
+  Category.findAll({
+    include: [Product],
+  })
+  .then((categories) => res.json(categories))
+  .catch((error) => res.status(500).json(error))
 });
 
 
 router.get('/:id', async (req, res) => {
-  try {
-    const getId = await Category.findOne({
-  where: {
-    id: req.params.id,
-  },
-  include: {
-    model: Product,
-    attributes: ['id', 'product_name', 'price', 'stock', 'category_id'],
-  }
-  })
-  res.json(getId)
-  }
-  catch (error) { res.status(500).json(error) }
-});
-
-
-
-router.post('/', async (req, res) => {
-  try {
-    const getId = await Category.create(req.body) }
-  catch (error) { res.status(400).json(error) }
-});
-
-router.put('/:id', async (req, res) => {
-  try {
-  const getId = await Category.update(
-    {
-      category_name: req.body.category_name
+  Category.findOne({
+    where: {
+      id: req.params.id,
     },
-    {
-      where: { id: req.params.id },
-    })
-    res.json(getId)
-  }
-  catch (error) { res.status(400).json(error) }
+    include: [Product],
+  })
+  .then((category) => res.json(category))
+  .catch((error) => res.status(400).json(error))
 });
 
-router.delete('/:id', async (req, res) => {
-  try { 
-    const list = await Category.destroy({
-    where: { id: req.params.id },
+router.post('/', (req, res) => {
+  Category.create(req.body)
+    .then((category) => res.status(200).json(category))
+    .catch((error) => res.status(400).json(error))
+})
+
+router.put('/:id', (req, res) => {
+  Category.update(req.body, {
+    where: {
+      id: req.params.id,
+    },
   })
-  res.json(list)
-}
-  catch (error) { res.status(400).json(error) }
+  .then((category) => res.status(200).json(category))
+  .catch((error) => res.status(400).json(error))
+});
+
+router.delete('/:id', (req, res) => {
+  Category.destroy({
+    where: {
+      id: req.params.id,
+    },
+  })
+  .then((category) => res.status(200).json(category))
+  .catch((error) => res.status(400).json(error))
 });
 
 module.exports = router;
